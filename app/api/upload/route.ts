@@ -10,6 +10,18 @@ export async function POST(request: NextRequest) {
   try {
     console.log('Iniciando upload...')
     
+    // Verificar se o Content-Type está correto
+    const contentType = request.headers.get('content-type')
+    console.log('Content-Type recebido:', contentType)
+    
+    if (!contentType || !contentType.includes('multipart/form-data')) {
+      console.log('Content-Type inválido:', contentType)
+      return NextResponse.json({ 
+        error: 'Content-Type deve ser multipart/form-data',
+        received: contentType 
+      }, { status: 400 })
+    }
+    
     const formData = await request.formData()
     const file = formData.get('file') as File
 
@@ -70,6 +82,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Erro no upload:', error)
-    return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'Erro interno do servidor',
+      details: error instanceof Error ? error.message : 'Erro desconhecido'
+    }, { status: 500 })
   }
 }
