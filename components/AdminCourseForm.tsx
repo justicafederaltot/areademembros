@@ -21,6 +21,14 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Verificar se tem imagem
+    if (!formData.image_url) {
+      alert('Por favor, selecione uma imagem para o curso!')
+      return
+    }
+    
+    console.log('Enviando curso com dados:', formData)
     setSaving(true)
 
     try {
@@ -33,6 +41,9 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
       })
 
       if (response.ok) {
+        const result = await response.json()
+        console.log('Curso criado com sucesso:', result)
+        
         setFormData({
           title: '',
           description: '',
@@ -46,10 +57,13 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
         }
         onSaved()
       } else {
-        console.error('Error saving course')
+        const error = await response.json()
+        console.error('Erro ao salvar curso:', error)
+        alert(`Erro ao salvar curso: ${error.error}`)
       }
     } catch (error) {
-      console.error('Error saving course:', error)
+      console.error('Erro ao salvar curso:', error)
+      alert('Erro ao salvar curso')
     } finally {
       setSaving(false)
     }
@@ -66,6 +80,7 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      console.log('Arquivo selecionado:', file.name, file.size, file.type)
       setSelectedFile(file)
       
       // Criar preview da imagem
@@ -84,6 +99,7 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
     const fileToUpload = file || selectedFile
     if (!fileToUpload) return
 
+    console.log('Iniciando upload do arquivo:', fileToUpload.name)
     setUploading(true)
     try {
       const formData = new FormData()
@@ -96,6 +112,7 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
 
       if (response.ok) {
         const data = await response.json()
+        console.log('Upload bem-sucedido:', data)
         setFormData(prev => ({
           ...prev,
           image_url: data.imageUrl
@@ -103,6 +120,7 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
         console.log('Imagem enviada com sucesso:', data.imageUrl)
       } else {
         const error = await response.json()
+        console.error('Erro no upload:', error)
         alert(`Erro ao enviar imagem: ${error.error}`)
       }
     } catch (error) {
@@ -157,14 +175,14 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
             onChange={handleChange}
             required
             rows={3}
-                            className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
             placeholder="Ex: Configure a Estrutura de Anunciante Profissional"
           />
         </div>
 
         <div>
           <label htmlFor="image" className="block text-sm font-medium text-gray-300 mb-2">
-            Imagem do Curso
+            Imagem do Curso *
           </label>
           
           {/* Input de arquivo */}
@@ -175,6 +193,7 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
             name="image"
             accept="image/*"
             onChange={handleFileSelect}
+            required
             className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-md text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-500 file:text-white hover:file:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
           
@@ -241,8 +260,8 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
 
         <button
           type="submit"
-          disabled={saving}
-                     className="w-full bg-gradient-to-r from-primary-500/60 to-primary-700/90 hover:from-primary-500 hover:to-primary-600 disabled:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md transition-all duration-200 backdrop-blur-sm border border-primary-500/30 shadow-lg shadow-primary-500/20"
+          disabled={saving || !formData.image_url}
+          className="w-full bg-gradient-to-r from-primary-500/60 to-primary-700/90 hover:from-primary-500 hover:to-primary-600 disabled:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md transition-all duration-200 backdrop-blur-sm border border-primary-500/30 shadow-lg shadow-primary-500/20"
         >
           {saving ? 'Salvando...' : 'Salvar Curso'}
         </button>
