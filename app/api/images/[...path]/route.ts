@@ -35,7 +35,10 @@ export async function GET(
       contentType = 'image/webp'
     }
     
-    return new NextResponse(imageBuffer, {
+    // Converter Buffer para Uint8Array para compatibilidade com NextResponse
+    const uint8Array = new Uint8Array(imageBuffer)
+    
+    return new NextResponse(uint8Array, {
       headers: {
         'Content-Type': contentType,
         'Cache-Control': 'public, max-age=31536000',
