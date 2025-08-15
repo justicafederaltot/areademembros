@@ -13,7 +13,7 @@ async function fixImageUrls() {
     
     console.log('Arquivos encontrados:', imageFiles)
 
-    // Buscar cursos no banco
+    // Buscar todos os cursos com imagens
     const courses = await pool.query('SELECT id, title, image_url FROM courses WHERE image_url LIKE \'/uploads/%\'')
     
     console.log('Cursos com imagens:', courses.rows)
@@ -29,10 +29,14 @@ async function fixImageUrls() {
       if (!fileExists) {
         console.log(`Arquivo não encontrado para: ${course.title} - ${fileName}`)
         
-        // Tentar encontrar um arquivo similar
-        const similarFile = imageFiles.find(file => 
-          file.includes('RPV') || file.includes('SENTENÇA') || file.includes('SENTENCA')
-        )
+        // Tentar encontrar um arquivo similar baseado no título
+        let similarFile = null
+        
+        if (course.title.includes('RPV')) {
+          similarFile = imageFiles.find(file => file.includes('RPV'))
+        } else if (course.title.includes('SENTENÇA') || course.title.includes('sentenciar')) {
+          similarFile = imageFiles.find(file => file.includes('SENTENÇA'))
+        }
         
         if (similarFile) {
           const newUrl = `/uploads/${similarFile}`
@@ -41,6 +45,8 @@ async function fixImageUrls() {
             [newUrl, course.id]
           )
           console.log(`URL corrigida para ${course.title}: ${newUrl}`)
+        } else {
+          console.log(`Nenhum arquivo similar encontrado para: ${course.title}`)
         }
       } else {
         console.log(`Arquivo encontrado para: ${course.title} - ${fileName}`)
