@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { query } from '@/lib/database'
+import pool from '@/lib/database'
+
+// Forçar rota dinâmica para evitar erro de SSG
+export const dynamic = 'force-dynamic'
 
 export async function GET(
   request: NextRequest,
@@ -9,7 +12,7 @@ export async function GET(
     const courseId = parseInt(params.id)
     
     // Buscar o curso
-    const courseResult = await query(
+    const courseResult = await pool.query(
       'SELECT * FROM courses WHERE id = $1',
       [courseId]
     )
@@ -21,7 +24,7 @@ export async function GET(
     const course = courseResult.rows[0]
     
     // Buscar as aulas do curso
-    const lessonsResult = await query(
+    const lessonsResult = await pool.query(
       'SELECT * FROM lessons WHERE course_id = $1 ORDER BY order_index ASC',
       [courseId]
     )
@@ -47,7 +50,7 @@ export async function DELETE(
     console.log('Tentando deletar curso:', courseId)
     
     // Verificar se o curso existe
-    const courseResult = await query(
+    const courseResult = await pool.query(
       'SELECT * FROM courses WHERE id = $1',
       [courseId]
     )
@@ -60,14 +63,14 @@ export async function DELETE(
     console.log('Curso encontrado, deletando aulas...')
     
     // Deletar todas as aulas do curso primeiro (devido à foreign key)
-    const lessonsDeleteResult = await query(
+    const lessonsDeleteResult = await pool.query(
       'DELETE FROM lessons WHERE course_id = $1',
       [courseId]
     )
     console.log('Aulas deletadas:', lessonsDeleteResult.rowCount)
     
     // Deletar o curso
-    const courseDeleteResult = await query(
+    const courseDeleteResult = await pool.query(
       'DELETE FROM courses WHERE id = $1',
       [courseId]
     )

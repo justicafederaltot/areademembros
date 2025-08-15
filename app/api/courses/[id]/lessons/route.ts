@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import pool from '@/lib/database'
 
+// Forçar rota dinâmica para evitar erro de SSG
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }

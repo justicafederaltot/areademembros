@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { query } from '@/lib/database'
+import pool from '@/lib/database'
+
+// Forçar rota dinâmica para evitar erro de SSG
+export const dynamic = 'force-dynamic'
 
 export async function DELETE(
   request: NextRequest,
@@ -10,7 +13,7 @@ export async function DELETE(
     console.log('Tentando deletar aula:', lessonId)
     
     // Verificar se a aula existe
-    const lessonResult = await query(
+    const lessonResult = await pool.query(
       'SELECT * FROM lessons WHERE id = $1',
       [lessonId]
     )
@@ -23,7 +26,7 @@ export async function DELETE(
     console.log('Aula encontrada, deletando...')
     
     // Deletar a aula
-    const deleteResult = await query(
+    const deleteResult = await pool.query(
       'DELETE FROM lessons WHERE id = $1',
       [lessonId]
     )
