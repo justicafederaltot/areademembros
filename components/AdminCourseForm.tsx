@@ -63,7 +63,7 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
     }))
   }
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
       setSelectedFile(file)
@@ -74,16 +74,20 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
         setPreviewUrl(e.target?.result as string)
       }
       reader.readAsDataURL(file)
+
+      // Fazer upload automático da imagem
+      await handleUpload(file)
     }
   }
 
-  const handleUpload = async () => {
-    if (!selectedFile) return
+  const handleUpload = async (file?: File) => {
+    const fileToUpload = file || selectedFile
+    if (!fileToUpload) return
 
     setUploading(true)
     try {
       const formData = new FormData()
-      formData.append('file', selectedFile)
+      formData.append('file', fileToUpload)
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -96,7 +100,7 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
           ...prev,
           image_url: data.imageUrl
         }))
-        alert('Imagem enviada com sucesso!')
+        console.log('Imagem enviada com sucesso:', data.imageUrl)
       } else {
         const error = await response.json()
         alert(`Erro ao enviar imagem: ${error.error}`)
@@ -194,14 +198,17 @@ export default function AdminCourseForm({ onSaved }: AdminCourseFormProps) {
           
           {/* Botões de ação */}
           <div className="mt-4 flex gap-2">
-            <button
-              type="button"
-              onClick={handleUpload}
-              disabled={!selectedFile || uploading}
-              className="px-4 py-2 bg-primary-500 hover:bg-primary-600 disabled:bg-gray-600 text-white text-sm font-semibold rounded-md transition-colors"
-            >
-              {uploading ? 'Enviando...' : 'Enviar Imagem'}
-            </button>
+            {uploading && (
+              <span className="px-4 py-2 bg-blue-500 text-white text-sm rounded-md">
+                Enviando imagem...
+              </span>
+            )}
+            
+            {formData.image_url && (
+              <span className="px-4 py-2 bg-green-500 text-white text-sm rounded-md">
+                ✓ Imagem carregada
+              </span>
+            )}
             
             {(selectedFile || formData.image_url) && (
               <button
