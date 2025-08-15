@@ -7,8 +7,8 @@ export default function Banner() {
                    <section className="relative bg-gradient-to-br from-black to-black py-32 overflow-hidden">
        {/* Background Image */}
        <div 
-         className="absolute inset-0 bg-contain bg-center bg-no-repeat opacity-20"
-         style={{ backgroundImage: 'url(/images/banner/BANNER2.png)' }}
+         className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
+         style={{ backgroundImage: 'url(/images/banner/BANNER.png)' }}
        ></div>
        {/* Content Overlay */}
        <div className="relative z-10">
