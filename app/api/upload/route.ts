@@ -41,9 +41,8 @@ export async function POST(request: NextRequest) {
       await mkdir(uploadDir, { recursive: true })
     }
 
-    // Gerar nome único para o arquivo
-    const timestamp = Date.now()
-    const fileName = `${timestamp}-${file.name}`
+    // Usar apenas o nome original do arquivo (sem timestamp)
+    const fileName = file.name
     const filePath = join(uploadDir, fileName)
     
     console.log('Salvando arquivo em:', filePath)
