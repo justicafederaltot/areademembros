@@ -36,34 +36,34 @@ async function createSampleData() {
     // Criar cursos de exemplo
     const courses = [
       {
-        title: 'BASE DE OPERAÇÃO',
-        description: 'Configure a Estrutura de Anunciante Profissional',
+        title: 'Como gerar RPVs',
+        description: 'Tutorial completo sobre como gerar RPVs no sistema',
         category: 'jef',
-        image_url: ''
+        image_url: '/images/banner/BANNER1.png'
       },
       {
-        title: 'DOMÍNIO DO TRÁFEGO',
-        description: 'Domine a Criação das Campanhas de Resultados',
+        title: 'Como sentenciar processos',
+        description: 'Guia prático para sentenciar processos na Justiça Federal',
         category: 'jef',
-        image_url: ''
+        image_url: '/images/banner/BANNER1.png'
       },
       {
-        title: 'MÁQUINAS DE VENDAS ONLINE',
-        description: 'A Caixa Preta de Estratégias que Geram Milhões',
-        category: 'jef',
-        image_url: ''
-      },
-      {
-        title: 'PROFISSÃO GESTOR DE TRÁFEGO',
-        description: 'Aprenda a ser um gestor de tráfego profissional',
+        title: 'Tutorial VARA - Processo 1',
+        description: 'Primeiro tutorial da VARA sobre procedimentos específicos',
         category: 'vara',
-        image_url: ''
+        image_url: '/images/banner/BANNER2.png'
       },
       {
-        title: 'RECORRÊNCIA ETERNA Google Ads',
-        description: 'Estratégias para criar recorrência no Google Ads',
+        title: 'Tutorial VARA - Processo 2',
+        description: 'Segundo tutorial da VARA sobre procedimentos específicos',
         category: 'vara',
-        image_url: ''
+        image_url: '/images/banner/BANNER2.png'
+      },
+      {
+        title: 'Tutorial VARA - Processo 3',
+        description: 'Terceiro tutorial da VARA sobre procedimentos específicos',
+        category: 'vara',
+        image_url: '/images/banner/BANNER2.png'
       }
     ]
 
@@ -78,14 +78,14 @@ async function createSampleData() {
       // Criar aulas de exemplo para cada curso
       const lessons = [
         {
-          title: 'BOAS VINDAS',
-          description: 'Aula de boas-vindas ao curso',
+          title: 'Introdução',
+          description: 'Aula introdutória ao tutorial',
           video_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
           order_index: 1
         },
         {
-          title: 'INTRODUÇÃO AO CONTEÚDO',
-          description: 'Introdução aos conceitos principais',
+          title: 'Passo a Passo',
+          description: 'Tutorial detalhado passo a passo',
           video_url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
           order_index: 2
         }

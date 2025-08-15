@@ -2,15 +2,22 @@
 
 import { Course } from '@/types'
 import { Lock } from 'lucide-react'
+import { useState } from 'react'
 
 interface CourseCardProps {
   course: Course
 }
 
 export default function CourseCard({ course }: CourseCardProps) {
+  const [imageError, setImageError] = useState(false)
+
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
     window.location.href = `/course/${course.id}`
+  }
+
+  const handleImageError = () => {
+    setImageError(true)
   }
 
   return (
@@ -20,15 +27,19 @@ export default function CourseCard({ course }: CourseCardProps) {
     >
       {/* Image */}
       <div className="relative h-48 bg-gradient-to-br from-gray-600 to-gray-700">
-        {course.image_url ? (
+        {course.image_url && !imageError ? (
           <img 
             src={course.image_url} 
             alt={course.title}
             className="w-full h-full object-cover"
+            onError={handleImageError}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-gray-400">Imagem do Curso</span>
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-700 to-gray-800">
+            <div className="text-center">
+              <div className="text-4xl mb-2">📚</div>
+              <span className="text-gray-400 text-sm">{course.title}</span>
+            </div>
           </div>
         )}
         
