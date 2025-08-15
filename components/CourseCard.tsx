@@ -1,7 +1,7 @@
 'use client'
 
 import { Course } from '@/types'
-import { Lock } from 'lucide-react'
+import { Unlock } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 interface CourseCardProps {
@@ -60,9 +60,9 @@ export default function CourseCard({ course }: CourseCardProps) {
           </div>
         )}
         
-        {/* Lock Icon */}
+        {/* Unlock Icon */}
         <div className="absolute top-3 right-3">
-          <Lock className="h-5 w-5 text-gray-400" />
+          <Unlock className="h-5 w-5 text-gray-400" />
         </div>
         
         {/* Category Badge */}
