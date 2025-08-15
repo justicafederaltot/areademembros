@@ -2,7 +2,7 @@
 
 import { Course } from '@/types'
 import { Lock } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 interface CourseCardProps {
   course: Course
@@ -11,13 +11,24 @@ interface CourseCardProps {
 export default function CourseCard({ course }: CourseCardProps) {
   const [imageError, setImageError] = useState(false)
 
+  // Reset imageError when course.image_url changes
+  useEffect(() => {
+    setImageError(false)
+  }, [course.image_url])
+
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
     window.location.href = `/course/${course.id}`
   }
 
   const handleImageError = () => {
+    console.log('Image failed to load:', course.image_url)
     setImageError(true)
+  }
+
+  const handleImageLoad = () => {
+    console.log('Image loaded successfully:', course.image_url)
+    setImageError(false)
   }
 
   return (
@@ -33,12 +44,18 @@ export default function CourseCard({ course }: CourseCardProps) {
             alt={course.title}
             className="w-full h-full object-cover"
             onError={handleImageError}
+            onLoad={handleImageLoad}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-700 to-gray-800">
             <div className="text-center">
               <div className="text-4xl mb-2">📚</div>
               <span className="text-gray-400 text-sm">{course.title}</span>
+              {course.image_url && (
+                <div className="text-xs text-red-400 mt-1">
+                  Erro ao carregar: {course.image_url}
+                </div>
+              )}
             </div>
           </div>
         )}
