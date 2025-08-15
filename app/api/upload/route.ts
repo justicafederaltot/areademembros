@@ -70,8 +70,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Erro ao salvar arquivo' }, { status: 500 })
     }
 
-    // Retornar URL da imagem
-    const imageUrl = `/uploads/${fileName}`
+    // Retornar URL da imagem usando a API route
+    const imageUrl = `/api/images/${fileName}`
     console.log('Upload concluído:', imageUrl)
 
     return NextResponse.json({ 
