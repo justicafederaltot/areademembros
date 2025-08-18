@@ -50,6 +50,7 @@ export async function initDatabase() {
         description TEXT,
         video_url VARCHAR(500) NOT NULL,
         order_index INTEGER DEFAULT 0,
+        attachments JSONB DEFAULT '[]',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `)
@@ -71,6 +72,20 @@ export async function initDatabase() {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS uploaded_images (
         id SERIAL PRIMARY KEY,
+        filename VARCHAR(255) NOT NULL,
+        original_name VARCHAR(255) NOT NULL,
+        content_type VARCHAR(100) NOT NULL,
+        file_size INTEGER NOT NULL,
+        file_data BYTEA NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+
+    // Tabela de anexos de aulas (para produção)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS lesson_attachments (
+        id SERIAL PRIMARY KEY,
+        lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
         filename VARCHAR(255) NOT NULL,
         original_name VARCHAR(255) NOT NULL,
         content_type VARCHAR(100) NOT NULL,

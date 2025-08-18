@@ -10,7 +10,7 @@ export async function PUT(
 ) {
   try {
     const lessonId = parseInt(params.id)
-    const { title, description, video_url, order_index } = await request.json()
+    const { title, description, video_url, order_index, attachments } = await request.json()
 
     if (!title || !description || !video_url || !order_index) {
       return NextResponse.json(
@@ -31,8 +31,8 @@ export async function PUT(
 
     // Atualizar a aula
     const result = await pool.query(
-      'UPDATE lessons SET title = $1, description = $2, video_url = $3, order_index = $4 WHERE id = $5 RETURNING *',
-      [title, description, video_url, order_index, lessonId]
+      'UPDATE lessons SET title = $1, description = $2, video_url = $3, order_index = $4, attachments = $5 WHERE id = $6 RETURNING *',
+      [title, description, video_url, order_index, JSON.stringify(attachments || []), lessonId]
     )
 
     return NextResponse.json(result.rows[0])

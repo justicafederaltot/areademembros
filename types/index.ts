@@ -15,6 +15,15 @@ export interface Course {
   created_at: string
 }
 
+export interface Attachment {
+  id: number
+  filename: string
+  original_name: string
+  content_type: string
+  file_size: number
+  url: string
+}
+
 export interface Lesson {
   id: number
   course_id: number
@@ -22,6 +31,7 @@ export interface Lesson {
   description: string
   video_url: string
   order_index: number
+  attachments?: Attachment[]
   created_at: string
 }
 

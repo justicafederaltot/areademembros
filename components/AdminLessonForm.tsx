@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Course } from '@/types'
+import { Course, Attachment } from '@/types'
+import LessonAttachments from './LessonAttachments'
 
 interface AdminLessonFormProps {
   courses: Course[]
@@ -23,6 +24,7 @@ export default function AdminLessonForm({
     order_index: 1
   })
   const [saving, setSaving] = useState(false)
+  const [attachments, setAttachments] = useState<Attachment[]>([])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -40,7 +42,10 @@ export default function AdminLessonForm({
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          attachments: attachments
+        }),
       })
 
       if (response.ok) {
@@ -50,6 +55,7 @@ export default function AdminLessonForm({
           video_url: '',
           order_index: 1
         })
+        setAttachments([])
         onSaved()
       } else {
         console.error('Error saving lesson')
@@ -166,7 +172,7 @@ export default function AdminLessonForm({
           <button
             type="submit"
             disabled={saving}
-                         className="w-full bg-gradient-to-r from-primary-500/60 to-primary-700/90 hover:from-primary-500 hover:to-primary-600 disabled:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md transition-all duration-200 backdrop-blur-sm border border-primary-500/30 shadow-lg shadow-primary-500/20"
+            className="w-full bg-gradient-to-r from-primary-500/60 to-primary-700/90 hover:from-primary-500 hover:to-primary-600 disabled:bg-gray-600 text-white font-semibold py-2 px-4 rounded-md transition-all duration-200 backdrop-blur-sm border border-primary-500/30 shadow-lg shadow-primary-500/20"
           >
             {saving ? 'Salvando...' : 'Salvar Aula'}
           </button>

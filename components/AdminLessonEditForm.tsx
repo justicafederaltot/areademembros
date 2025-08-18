@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Lesson, Course } from '@/types'
+import { Lesson, Course, Attachment } from '@/types'
+import LessonAttachments from './LessonAttachments'
 
 interface AdminLessonEditFormProps {
   lesson: Lesson | null
@@ -18,6 +19,7 @@ export default function AdminLessonEditForm({ lesson, courses, onSaved, onCancel
     order_index: 1
   })
   const [saving, setSaving] = useState(false)
+  const [attachments, setAttachments] = useState<Attachment[]>([])
 
   // Carregar dados da aula quando o componente receber uma aula
   useEffect(() => {
@@ -28,6 +30,7 @@ export default function AdminLessonEditForm({ lesson, courses, onSaved, onCancel
         video_url: lesson.video_url,
         order_index: lesson.order_index
       })
+      setAttachments(lesson.attachments || [])
     }
   }, [lesson])
 
@@ -45,7 +48,10 @@ export default function AdminLessonEditForm({ lesson, courses, onSaved, onCancel
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          attachments: attachments
+        }),
       })
 
       if (response.ok) {
@@ -161,6 +167,13 @@ export default function AdminLessonEditForm({ lesson, courses, onSaved, onCancel
             className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
+
+        {/* Gerenciamento de Anexos */}
+        <LessonAttachments
+          lessonId={lesson.id}
+          attachments={attachments}
+          onAttachmentsChange={setAttachments}
+        />
 
         <div className="flex gap-3">
           <button

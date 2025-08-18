@@ -39,7 +39,7 @@ export async function POST(
 ) {
   try {
     const courseId = parseInt(params.id)
-    const { title, description, video_url, order_index } = await request.json()
+    const { title, description, video_url, order_index, attachments } = await request.json()
 
     if (!title || !video_url) {
       return NextResponse.json(
@@ -49,8 +49,8 @@ export async function POST(
     }
 
     const result = await pool.query(
-      'INSERT INTO lessons (course_id, title, description, video_url, order_index) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [courseId, title, description, video_url, order_index || 1]
+      'INSERT INTO lessons (course_id, title, description, video_url, order_index, attachments) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+      [courseId, title, description, video_url, order_index || 1, JSON.stringify(attachments || [])]
     )
 
     return NextResponse.json(result.rows[0], { status: 201 })
