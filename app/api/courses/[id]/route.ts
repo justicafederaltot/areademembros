@@ -41,6 +41,47 @@ export async function GET(
   }
 }
 
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const courseId = parseInt(params.id)
+    const { title, description, image_url, category } = await request.json()
+
+    if (!title || !description || !category) {
+      return NextResponse.json(
+        { error: 'Título, descrição e categoria são obrigatórios' },
+        { status: 400 }
+      )
+    }
+
+    // Verificar se o curso existe
+    const courseResult = await pool.query(
+      'SELECT * FROM courses WHERE id = $1',
+      [courseId]
+    )
+    
+    if (courseResult.rows.length === 0) {
+      return NextResponse.json({ error: 'Curso não encontrado' }, { status: 404 })
+    }
+
+    // Atualizar o curso
+    const result = await pool.query(
+      'UPDATE courses SET title = $1, description = $2, image_url = $3, category = $4 WHERE id = $5 RETURNING *',
+      [title, description, image_url, category, courseId]
+    )
+
+    return NextResponse.json(result.rows[0])
+  } catch (error) {
+    console.error('Error updating course:', error)
+    return NextResponse.json(
+      { error: 'Erro interno do servidor' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }

@@ -4,7 +4,9 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/components/AuthProvider'
 import Header from '@/components/Header'
 import AdminCourseForm from '@/components/AdminCourseForm'
+import AdminCourseEditForm from '@/components/AdminCourseEditForm'
 import AdminLessonForm from '@/components/AdminLessonForm'
+import AdminLessonEditForm from '@/components/AdminLessonEditForm'
 import { Course, Lesson } from '@/types'
 
 export default function AdminPage() {
@@ -13,6 +15,10 @@ export default function AdminPage() {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
   const [lessons, setLessons] = useState<Lesson[]>([])
   const [activeTab, setActiveTab] = useState<'courses' | 'lessons'>('courses')
+  
+  // Estados para edição
+  const [editingCourse, setEditingCourse] = useState<Course | null>(null)
+  const [editingLesson, setEditingLesson] = useState<Lesson | null>(null)
 
   useEffect(() => {
     if (user && user.role === 'admin') {
@@ -52,12 +58,29 @@ export default function AdminPage() {
 
   const handleCourseSaved = () => {
     fetchCourses()
+    setEditingCourse(null)
   }
 
   const handleLessonSaved = () => {
     if (selectedCourse) {
       fetchLessons(selectedCourse.id)
     }
+    setEditingLesson(null)
+  }
+
+  const handleEditCourse = (course: Course) => {
+    setEditingCourse(course)
+    setActiveTab('courses')
+  }
+
+  const handleEditLesson = (lesson: Lesson) => {
+    setEditingLesson(lesson)
+    setActiveTab('lessons')
+  }
+
+  const handleCancelEdit = () => {
+    setEditingCourse(null)
+    setEditingLesson(null)
   }
 
   const handleDeleteCourse = async (courseId: number) => {
@@ -178,14 +201,31 @@ export default function AdminPage() {
           {/* Form Section */}
           <div className="bg-black rounded-lg p-6">
             {activeTab === 'courses' ? (
-              <AdminCourseForm onSaved={handleCourseSaved} />
+              editingCourse ? (
+                <AdminCourseEditForm 
+                  course={editingCourse}
+                  onSaved={handleCourseSaved}
+                  onCancel={handleCancelEdit}
+                />
+              ) : (
+                <AdminCourseForm onSaved={handleCourseSaved} />
+              )
             ) : (
-              <AdminLessonForm 
-                courses={courses}
-                selectedCourse={selectedCourse}
-                onCourseSelect={setSelectedCourse}
-                onSaved={handleLessonSaved}
-              />
+              editingLesson ? (
+                <AdminLessonEditForm 
+                  lesson={editingLesson}
+                  courses={courses}
+                  onSaved={handleLessonSaved}
+                  onCancel={handleCancelEdit}
+                />
+              ) : (
+                <AdminLessonForm 
+                  courses={courses}
+                  selectedCourse={selectedCourse}
+                  onCourseSelect={setSelectedCourse}
+                  onSaved={handleLessonSaved}
+                />
+              )
             )}
           </div>
 
@@ -205,6 +245,12 @@ export default function AdminPage() {
                       <div className="flex items-center justify-between mt-2">
                         <span className="text-xs text-gray-500">{course.category}</span>
                         <div className="flex items-center space-x-2">
+                          <button
+                            onClick={() => handleEditCourse(course)}
+                            className="text-xs text-blue-500 hover:text-blue-400 px-2 py-1 rounded border border-blue-500/20 hover:bg-blue-500/10"
+                          >
+                            Editar
+                          </button>
                           <button
                             onClick={() => {
                               setSelectedCourse(course)
@@ -246,6 +292,13 @@ export default function AdminPage() {
                         <p className="text-sm text-gray-400 mt-1">{lesson.description}</p>
                         <div className="flex items-center justify-between mt-2">
                           <span className="text-xs text-gray-500">Ordem: {lesson.order_index}</span>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => handleEditLesson(lesson)}
+                              className="text-xs text-blue-500 hover:text-blue-400 px-2 py-1 rounded border border-blue-500/20 hover:bg-blue-500/10"
+                            >
+                              Editar
+                            </button>
                                                      <button
                              onClick={(e) => {
                                e.preventDefault()
@@ -256,6 +309,7 @@ export default function AdminPage() {
                            >
                              Excluir
                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}
