@@ -5,7 +5,7 @@ async function fixCourseImages() {
     console.log('Corrigindo URLs das imagens dos cursos...')
     
     // Mapeamento de imagens que não existem para imagens que existem
-    const imageMapping = {
+    const imageMapping: Record<string, string> = {
       'audiencia.png': 'CAPA RPV.png',
       'triagem.png': 'SENTENÇA.png',
       'PERÍCIAS.png': 'CAPA RPV.png',
@@ -23,10 +23,10 @@ async function fixCourseImages() {
       const currentImageUrl = course.image_url
       
       // Extrair o nome do arquivo da URL
-      const fileName = currentImageUrl.replace('/api/images/', '')
+      const fileName: string = currentImageUrl.replace('/api/images/', '')
       
       // Verificar se a imagem atual não existe e se há um mapeamento
-      if (imageMapping[fileName]) {
+      if (fileName in imageMapping) {
         const newImageUrl = `/api/images/${imageMapping[fileName]}`
         
         console.log(`\nCurso ID ${course.id}: "${course.title}"`)

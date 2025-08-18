@@ -4,16 +4,6 @@ async function restoreOriginalImages() {
   try {
     console.log('Restaurando URLs originais das imagens dos cursos...')
     
-    // Mapeamento para restaurar as URLs originais
-    const imageMapping = {
-      'CAPA RPV.png': 'audiencia.png',
-      'SENTENÇA.png': 'triagem.png',
-      'CAPA RPV.png': 'PERÍCIAS.png',
-      'SENTENÇA.png': 'SENTENÇA CRIMINAL.png',
-      'CAPA RPV.png': 'analise.png',
-      'SENTENÇA.png': 'CAPA SENTENÇA.png'
-    }
-    
     // Buscar todos os cursos
     const result = await pool.query('SELECT * FROM courses ORDER BY id')
     
@@ -23,7 +13,7 @@ async function restoreOriginalImages() {
       const currentImageUrl = course.image_url
       
       // Extrair o nome do arquivo da URL
-      const fileName = currentImageUrl.replace('/api/images/', '')
+      const fileName: string = currentImageUrl.replace('/api/images/', '')
       
       // Verificar se a imagem atual foi alterada e se há um mapeamento para restaurar
       if (fileName === 'CAPA RPV.png' || fileName === 'SENTENÇA.png') {
