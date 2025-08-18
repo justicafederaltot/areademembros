@@ -25,6 +25,7 @@ export default function AdminLessonForm({
   })
   const [saving, setSaving] = useState(false)
   const [attachments, setAttachments] = useState<Attachment[]>([])
+  const [lessonId, setLessonId] = useState<number | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,6 +50,9 @@ export default function AdminLessonForm({
       })
 
       if (response.ok) {
+        const result = await response.json()
+        setLessonId(result.id) // Salvar o ID da aula criada
+        
         setFormData({
           title: '',
           description: '',
@@ -56,6 +60,7 @@ export default function AdminLessonForm({
           order_index: 1
         })
         setAttachments([])
+        setLessonId(null)
         onSaved()
       } else {
         console.error('Error saving lesson')
@@ -177,6 +182,21 @@ export default function AdminLessonForm({
             {saving ? 'Salvando...' : 'Salvar Aula'}
           </button>
         </form>
+      )}
+
+      {/* Seção de Anexos - aparece após salvar a aula */}
+      {lessonId && (
+        <div className="mt-8 pt-6 border-t border-gray-600">
+          <h4 className="text-lg font-semibold text-white mb-4">Anexos da Aula</h4>
+          <p className="text-sm text-gray-400 mb-4">
+            Aula criada com sucesso! Agora você pode adicionar anexos para download.
+          </p>
+          <LessonAttachments
+            lessonId={lessonId}
+            attachments={attachments}
+            onAttachmentsChange={setAttachments}
+          />
+        </div>
       )}
     </div>
   )
