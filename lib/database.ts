@@ -67,6 +67,19 @@ export async function initDatabase() {
       )
     `)
 
+    // Tabela de imagens uploadadas (para produção)
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS uploaded_images (
+        id SERIAL PRIMARY KEY,
+        filename VARCHAR(255) NOT NULL,
+        original_name VARCHAR(255) NOT NULL,
+        content_type VARCHAR(100) NOT NULL,
+        file_size INTEGER NOT NULL,
+        file_data BYTEA NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+
     console.log('Database initialized successfully')
   } catch (error) {
     console.error('Error initializing database:', error)

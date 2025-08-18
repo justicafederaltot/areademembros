@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
+import pool from '@/lib/database'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,39 +12,87 @@ export async function GET(
 ) {
   try {
     const imagePath = params.path.join('/')
-    const fullPath = join(process.cwd(), 'public', 'uploads', imagePath)
     
     console.log('Solicitando imagem:', imagePath)
-    console.log('Caminho completo:', fullPath)
     
-    if (!existsSync(fullPath)) {
-      console.log('Arquivo não encontrado:', fullPath)
-      return NextResponse.json({ error: 'Imagem não encontrada' }, { status: 404 })
+    // Verificar se é um ID numérico (imagem do banco de dados)
+    const imageId = parseInt(imagePath)
+    
+    if (!isNaN(imageId)) {
+      // Buscar imagem no banco de dados
+      console.log('Buscando imagem no banco de dados, ID:', imageId)
+      
+      const result = await pool.query(
+        'SELECT * FROM uploaded_images WHERE id = $1',
+        [imageId]
+      )
+      
+      if (result.rows.length === 0) {
+        console.log('Imagem não encontrada no banco de dados:', imageId)
+        return NextResponse.json({ error: 'Imagem não encontrada' }, { status: 404 })
+      }
+      
+      const imageData = result.rows[0]
+      const imageBuffer = imageData.file_data
+      
+      // Determinar o tipo MIME baseado na extensão
+      const ext = imageData.original_name.split('.').pop()?.toLowerCase()
+      let contentType = 'image/png'
+      
+      if (ext === 'jpg' || ext === 'jpeg') {
+        contentType = 'image/jpeg'
+      } else if (ext === 'gif') {
+        contentType = 'image/gif'
+      } else if (ext === 'webp') {
+        contentType = 'image/webp'
+      }
+      
+      // Converter Buffer para Uint8Array para compatibilidade com NextResponse
+      const uint8Array = new Uint8Array(imageBuffer)
+      
+      return new NextResponse(uint8Array, {
+        headers: {
+          'Content-Type': contentType,
+          'Cache-Control': 'public, max-age=31536000',
+        },
+      })
+      
+    } else {
+      // Buscar imagem no sistema de arquivos (desenvolvimento)
+      console.log('Buscando imagem no sistema de arquivos:', imagePath)
+      
+      const fullPath = join(process.cwd(), 'public', 'uploads', imagePath)
+      console.log('Caminho completo:', fullPath)
+      
+      if (!existsSync(fullPath)) {
+        console.log('Arquivo não encontrado:', fullPath)
+        return NextResponse.json({ error: 'Imagem não encontrada' }, { status: 404 })
+      }
+      
+      const imageBuffer = await readFile(fullPath)
+      
+      // Determinar o tipo MIME baseado na extensão
+      const ext = imagePath.split('.').pop()?.toLowerCase()
+      let contentType = 'image/png'
+      
+      if (ext === 'jpg' || ext === 'jpeg') {
+        contentType = 'image/jpeg'
+      } else if (ext === 'gif') {
+        contentType = 'image/gif'
+      } else if (ext === 'webp') {
+        contentType = 'image/webp'
+      }
+      
+      // Converter Buffer para Uint8Array para compatibilidade com NextResponse
+      const uint8Array = new Uint8Array(imageBuffer)
+      
+      return new NextResponse(uint8Array, {
+        headers: {
+          'Content-Type': contentType,
+          'Cache-Control': 'public, max-age=31536000',
+        },
+      })
     }
-    
-    const imageBuffer = await readFile(fullPath)
-    
-    // Determinar o tipo MIME baseado na extensão
-    const ext = imagePath.split('.').pop()?.toLowerCase()
-    let contentType = 'image/png'
-    
-    if (ext === 'jpg' || ext === 'jpeg') {
-      contentType = 'image/jpeg'
-    } else if (ext === 'gif') {
-      contentType = 'image/gif'
-    } else if (ext === 'webp') {
-      contentType = 'image/webp'
-    }
-    
-    // Converter Buffer para Uint8Array para compatibilidade com NextResponse
-    const uint8Array = new Uint8Array(imageBuffer)
-    
-    return new NextResponse(uint8Array, {
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000',
-      },
-    })
     
   } catch (error) {
     console.error('Erro ao servir imagem:', error)
