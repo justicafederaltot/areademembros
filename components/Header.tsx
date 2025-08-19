@@ -15,7 +15,7 @@ export default function Header() {
           <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
             <img 
               src="/images/logo/LGOMARCA.png" 
-              alt="Destrava Logo" 
+              alt="JF-TOT Logo" 
               className="h-8 w-auto"
             />
           </Link>

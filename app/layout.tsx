@@ -6,7 +6,7 @@ import { AuthProvider } from '@/components/AuthProvider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Área de Membros - Destrava Academy',
+  title: 'Área de Membros - JF-TOT',
   description: 'Sistema completo de área de membros com cursos e aulas',
 }
 
