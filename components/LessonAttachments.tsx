@@ -1,5 +1,4 @@
 'use client'
-
 import { useState, useRef } from 'react'
 import { Attachment } from '@/types'
 
@@ -9,11 +8,11 @@ interface LessonAttachmentsProps {
   onAttachmentsChange: (attachments: Attachment[]) => void
 }
 
-export default function LessonAttachments({ 
-  lessonId, 
-  attachments, 
-  onAttachmentsChange 
-}: LessonAttachmentsProps) {
+interface LessonAttachmentsDisplayProps {
+  attachments: Attachment[]
+}
+
+export default function LessonAttachments({ lessonId, attachments, onAttachmentsChange }: LessonAttachmentsProps) {
   const [uploading, setUploading] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -22,7 +21,32 @@ export default function LessonAttachments({
     const file = e.target.files?.[0]
     if (!file) return
 
-    console.log('Anexo selecionado:', file.name, file.size, file.type)
+    // Validar tipo de arquivo
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/plain',
+      'text/csv',
+      'application/zip',
+      'application/x-rar-compressed'
+    ]
+
+    if (!allowedTypes.includes(file.type)) {
+      alert('Tipo de arquivo não permitido. Tipos aceitos: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, ZIP, RAR')
+      return
+    }
+
+    // Validar tamanho (50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      alert('Arquivo muito grande. Tamanho máximo: 50MB')
+      return
+    }
+
     setUploading(true)
 
     try {
@@ -36,36 +60,25 @@ export default function LessonAttachments({
       })
 
       if (response.ok) {
-        const data = await response.json()
-        console.log('Anexo enviado com sucesso:', data)
-        
-        // Adicionar o novo anexo à lista
-        const newAttachments = [...attachments, data.attachment]
-        onAttachmentsChange(newAttachments)
-        
-        // Limpar o input
+        const result = await response.json()
+        onAttachmentsChange([...attachments, result.attachment])
         if (fileInputRef.current) {
           fileInputRef.current.value = ''
         }
-        
-        alert('Anexo enviado com sucesso!')
       } else {
         const error = await response.json()
-        console.error('Erro no upload:', error)
-        alert(`Erro ao enviar anexo: ${error.error}`)
+        alert(`Erro ao fazer upload: ${error.error}`)
       }
     } catch (error) {
-      console.error('Erro no upload:', error)
-      alert('Erro ao enviar anexo')
+      console.error('Error uploading attachment:', error)
+      alert('Erro ao fazer upload do arquivo')
     } finally {
       setUploading(false)
     }
   }
 
   const handleDeleteAttachment = async (attachmentId: number) => {
-    if (!confirm('Tem certeza que deseja excluir este anexo?')) {
-      return
-    }
+    if (!confirm('Tem certeza que deseja excluir este anexo?')) return
 
     setDeleting(attachmentId)
 
@@ -75,17 +88,12 @@ export default function LessonAttachments({
       })
 
       if (response.ok) {
-        // Remover o anexo da lista
-        const updatedAttachments = attachments.filter(att => att.id !== attachmentId)
-        onAttachmentsChange(updatedAttachments)
-        alert('Anexo excluído com sucesso!')
+        onAttachmentsChange(attachments.filter(a => a.id !== attachmentId))
       } else {
-        const error = await response.json()
-        console.error('Erro ao excluir anexo:', error)
-        alert(`Erro ao excluir anexo: ${error.error}`)
+        alert('Erro ao excluir anexo')
       }
     } catch (error) {
-      console.error('Erro ao excluir anexo:', error)
+      console.error('Error deleting attachment:', error)
       alert('Erro ao excluir anexo')
     } finally {
       setDeleting(null)
@@ -102,7 +110,7 @@ export default function LessonAttachments({
 
   const getFileIcon = (contentType: string) => {
     if (contentType.includes('pdf')) return '📄'
-    if (contentType.includes('word')) return '📝'
+    if (contentType.includes('word') || contentType.includes('document')) return '📝'
     if (contentType.includes('excel') || contentType.includes('spreadsheet')) return '📊'
     if (contentType.includes('powerpoint') || contentType.includes('presentation')) return '📈'
     if (contentType.includes('text')) return '📄'
@@ -112,82 +120,120 @@ export default function LessonAttachments({
 
   return (
     <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">
-          Anexos da Aula
-        </label>
-        
-        {/* Input para upload */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar"
-          onChange={handleFileSelect}
+      <div className="flex items-center justify-between">
+        <h4 className="text-lg font-semibold text-white">Anexos da Aula</h4>
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-md text-white file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-primary-500 file:text-white hover:file:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50"
-        />
-        
-        <p className="text-xs text-gray-400 mt-1">
-          Tipos aceitos: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, ZIP, RAR (máx. 50MB)
-        </p>
-        
-        {uploading && (
-          <div className="mt-2">
-            <span className="px-3 py-1 bg-blue-500 text-white text-sm rounded-md">
-              Enviando anexo...
-            </span>
-          </div>
-        )}
+          className="bg-primary-500 hover:bg-primary-600 disabled:bg-gray-600 text-white px-3 py-1 rounded-md text-sm transition-colors"
+        >
+          {uploading ? 'Enviando...' : '+ Adicionar Anexo'}
+        </button>
       </div>
 
-      {/* Lista de anexos */}
-      {attachments.length > 0 && (
-        <div>
-          <h4 className="text-sm font-medium text-gray-300 mb-2">Anexos ({attachments.length})</h4>
-          <div className="space-y-2">
-            {attachments.map((attachment) => (
-              <div
-                key={attachment.id}
-                className="flex items-center justify-between p-3 bg-gray-800 rounded-md border border-gray-600"
-              >
-                <div className="flex items-center space-x-3">
-                  <span className="text-lg">{getFileIcon(attachment.content_type)}</span>
-                  <div>
-                    <p className="text-sm text-white font-medium">{attachment.original_name}</p>
-                    <p className="text-xs text-gray-400">
-                      {formatFileSize(attachment.file_size)} • {attachment.content_type}
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  <a
-                    href={attachment.url}
-                    download={attachment.original_name}
-                    className="text-xs text-blue-500 hover:text-blue-400 px-2 py-1 rounded border border-blue-500/20 hover:bg-blue-500/10"
-                  >
-                    Baixar
-                  </a>
-                  <button
-                    onClick={() => handleDeleteAttachment(attachment.id)}
-                    disabled={deleting === attachment.id}
-                    className="text-xs text-red-500 hover:text-red-400 px-2 py-1 rounded border border-red-500/20 hover:bg-red-500/10 disabled:opacity-50"
-                  >
-                    {deleting === attachment.id ? 'Excluindo...' : 'Excluir'}
-                  </button>
+      <input
+        ref={fileInputRef}
+        type="file"
+        onChange={handleFileSelect}
+        accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.zip,.rar"
+        className="hidden"
+      />
+
+      {attachments.length === 0 ? (
+        <p className="text-gray-400 text-sm">Nenhum anexo adicionado</p>
+      ) : (
+        <div className="space-y-2">
+          {attachments.map((attachment) => (
+            <div
+              key={attachment.id}
+              className="flex items-center justify-between p-3 bg-gray-800 rounded-lg"
+            >
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl">{getFileIcon(attachment.content_type)}</span>
+                <div>
+                  <p className="text-white font-medium">{attachment.original_name}</p>
+                  <p className="text-gray-400 text-sm">{formatFileSize(attachment.file_size)}</p>
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="flex items-center space-x-2">
+                <a
+                  href={attachment.url}
+                  download={attachment.original_name}
+                  className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm transition-colors"
+                >
+                  Download
+                </a>
+                <button
+                  onClick={() => handleDeleteAttachment(attachment.id)}
+                  disabled={deleting === attachment.id}
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-600 text-white px-3 py-1 rounded-md text-sm transition-colors"
+                >
+                  {deleting === attachment.id ? 'Excluindo...' : 'Excluir'}
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
       )}
+    </div>
+  )
+}
 
-      {attachments.length === 0 && (
-        <div className="text-center py-6 text-gray-400">
-          <p className="text-sm">Nenhum anexo adicionado ainda</p>
-          <p className="text-xs mt-1">Clique em "Escolher arquivo" para adicionar anexos</p>
-        </div>
-      )}
+// Componente para exibição apenas (sem edição)
+export function LessonAttachmentsDisplay({ attachments }: LessonAttachmentsDisplayProps) {
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes'
+    const k = 1024
+    const sizes = ['Bytes', 'KB', 'MB', 'GB']
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+  }
+
+  const getFileIcon = (contentType: string) => {
+    if (contentType.includes('pdf')) return '📄'
+    if (contentType.includes('word') || contentType.includes('document')) return '📝'
+    if (contentType.includes('excel') || contentType.includes('spreadsheet')) return '📊'
+    if (contentType.includes('powerpoint') || contentType.includes('presentation')) return '📈'
+    if (contentType.includes('text')) return '📄'
+    if (contentType.includes('zip') || contentType.includes('rar')) return '📦'
+    return '📎'
+  }
+
+  if (attachments.length === 0) {
+    return null
+  }
+
+  return (
+    <div className="mt-6 p-4 bg-gray-900 rounded-lg border border-gray-700">
+      <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+        <span className="mr-2">📎</span>
+        Anexos da Aula
+      </h4>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {attachments.map((attachment) => (
+          <div
+            key={attachment.id}
+            className="flex items-center p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
+          >
+            <span className="text-2xl mr-3">{getFileIcon(attachment.content_type)}</span>
+            <div className="flex-1 min-w-0">
+              <p className="text-white font-medium truncate" title={attachment.original_name}>
+                {attachment.original_name}
+              </p>
+              <p className="text-gray-400 text-sm">{formatFileSize(attachment.file_size)}</p>
+            </div>
+            <a
+              href={attachment.url}
+              download={attachment.original_name}
+              className="ml-2 bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded-md text-sm transition-colors whitespace-nowrap"
+            >
+              Download
+            </a>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

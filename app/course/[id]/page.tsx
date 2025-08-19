@@ -6,6 +6,7 @@ import { useAuth } from '@/components/AuthProvider'
 import Header from '@/components/Header'
 import VideoPlayer from '@/components/VideoPlayer'
 import LessonList from '@/components/LessonList'
+import { LessonAttachmentsDisplay } from '@/components/LessonAttachments'
 import { CourseWithLessons, LessonWithProgress } from '@/types'
 
 export default function CoursePage() {
@@ -120,13 +121,23 @@ export default function CoursePage() {
           {/* Video Player */}
           <div className="flex-1 p-4">
             {selectedLesson ? (
-              <VideoPlayer 
-                videoUrl={selectedLesson.video_url}
-                lessonId={selectedLesson.id}
-                onComplete={() => markLessonAsCompleted(selectedLesson.id)}
-              />
+              <div className="space-y-4">
+                {/* Video Player - Reduzido para 70% da altura */}
+                <div className="h-[70vh]">
+                  <VideoPlayer 
+                    videoUrl={selectedLesson.video_url}
+                    lessonId={selectedLesson.id}
+                    onComplete={() => markLessonAsCompleted(selectedLesson.id)}
+                  />
+                </div>
+                
+                {/* Anexos da Aula */}
+                <LessonAttachmentsDisplay 
+                  attachments={selectedLesson.attachments || []}
+                />
+              </div>
             ) : (
-                              <div className="w-full h-full bg-black rounded-lg flex items-center justify-center">
+              <div className="w-full h-full bg-black rounded-lg flex items-center justify-center">
                 <p className="text-gray-400">Selecione uma aula para começar</p>
               </div>
             )}
