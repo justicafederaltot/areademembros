@@ -86,40 +86,48 @@ export async function POST(request: NextRequest) {
     if (isProduction) {
       console.log('Ambiente de produção detectado - salvando anexo no banco de dados')
       
-      // Salvar anexo na tabela lesson_attachments
-      const result = await pool.query(
-        'INSERT INTO lesson_attachments (lesson_id, filename, original_name, content_type, file_size, file_data) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
-        [parseInt(lessonId), fileName, file.name, file.type, file.size, buffer]
-      )
-      
-      const attachmentId = result.rows[0].id
-      const attachmentUrl = `/api/attachments/${attachmentId}`
-      
-      // Atualizar o campo attachments na tabela lessons
-      const lesson = lessonResult.rows[0]
-      const currentAttachments = lesson.attachments || []
-      const newAttachment = {
-        id: attachmentId,
-        filename: fileName,
-        original_name: file.name,
-        content_type: file.type,
-        file_size: file.size,
-        url: attachmentUrl
+      try {
+        // Salvar anexo na tabela lesson_attachments
+        const result = await pool.query(
+          'INSERT INTO lesson_attachments (lesson_id, filename, original_name, content_type, file_size, file_data) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
+          [parseInt(lessonId), fileName, file.name, file.type, file.size, buffer]
+        )
+        
+        const attachmentId = result.rows[0].id
+        const attachmentUrl = `/api/attachments/${attachmentId}`
+        
+        // Atualizar o campo attachments na tabela lessons
+        const lesson = lessonResult.rows[0]
+        const currentAttachments = lesson.attachments || []
+        const newAttachment = {
+          id: attachmentId,
+          filename: fileName,
+          original_name: file.name,
+          content_type: file.type,
+          file_size: file.size,
+          url: attachmentUrl
+        }
+        
+        const updatedAttachments = [...currentAttachments, newAttachment]
+        
+        await pool.query(
+          'UPDATE lessons SET attachments = $1 WHERE id = $2',
+          [JSON.stringify(updatedAttachments), parseInt(lessonId)]
+        )
+        
+        console.log('Anexo enviado com sucesso (produção):', attachmentUrl)
+        return NextResponse.json({
+          success: true,
+          attachment: newAttachment,
+          message: 'Anexo enviado com sucesso'
+        })
+      } catch (dbError) {
+        console.error('Erro ao salvar anexo no banco de dados:', dbError)
+        return NextResponse.json({
+          error: 'Erro ao salvar anexo no banco de dados',
+          details: dbError instanceof Error ? dbError.message : 'Erro desconhecido'
+        }, { status: 500 })
       }
-      
-      const updatedAttachments = [...currentAttachments, newAttachment]
-      
-      await pool.query(
-        'UPDATE lessons SET attachments = $1 WHERE id = $2',
-        [JSON.stringify(updatedAttachments), parseInt(lessonId)]
-      )
-      
-      console.log('Anexo enviado com sucesso (produção):', attachmentUrl)
-      return NextResponse.json({
-        success: true,
-        attachment: newAttachment,
-        message: 'Anexo enviado com sucesso'
-      })
     } else {
       console.log('Ambiente de desenvolvimento detectado - salvando anexo no sistema de arquivos')
       
