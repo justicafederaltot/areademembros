@@ -1,10 +1,10 @@
-import pool from '../lib/database'
+import { query, closePool } from '../lib/database'
 
 async function checkAllCourses() {
   try {
     console.log('Verificando todos os cursos no banco...')
     
-    const result = await pool.query('SELECT id, title, description, category, image_url FROM courses ORDER BY id')
+    const result = await query('SELECT id, title, description, category, image_url FROM courses ORDER BY id')
     
     console.log(`Total de cursos: ${result.rows.length}`)
     console.log('Cursos encontrados:')
@@ -21,7 +21,7 @@ async function checkAllCourses() {
   } catch (error) {
     console.error('Erro ao verificar cursos:', error)
   } finally {
-    await pool.end()
+    await closePool()
   }
 }
 

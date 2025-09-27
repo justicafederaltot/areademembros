@@ -1,10 +1,10 @@
-import pool, { initDatabase } from '../lib/database'
+import { query, initDatabase, closePool } from '../lib/database'
 import bcrypt from 'bcryptjs'
 
 async function createAdminUser() {
   try {
     // Verificar se já existe um usuário admin
-    const existingAdmin = await pool.query(
+    const existingAdmin = await query(
       'SELECT * FROM users WHERE email = $1',
       ['admin@jus.com']
     )
@@ -18,7 +18,7 @@ async function createAdminUser() {
     const hashedPassword = await bcrypt.hash('admin123', 10)
 
     // Inserir usuário admin
-    await pool.query(
+    await query(
       'INSERT INTO users (email, password, name, role) VALUES ($1, $2, $3, $4)',
       ['admin@jus.com', hashedPassword, 'Administrador', 'admin']
     )
@@ -68,7 +68,7 @@ async function createSampleData() {
     ]
 
     for (const course of courses) {
-      const result = await pool.query(
+      const result = await query(
         'INSERT INTO courses (title, description, category, image_url) VALUES ($1, $2, $3, $4) RETURNING id',
         [course.title, course.description, course.category, course.image_url]
       )
@@ -92,7 +92,7 @@ async function createSampleData() {
       ]
 
       for (const lesson of lessons) {
-        await pool.query(
+        await query(
           'INSERT INTO lessons (course_id, title, description, video_url, order_index) VALUES ($1, $2, $3, $4, $5)',
           [courseId, lesson.title, lesson.description, lesson.video_url, lesson.order_index]
         )
@@ -117,9 +117,11 @@ async function main() {
     await createSampleData()
     
     console.log('Inicialização concluída!')
+    await closePool()
     process.exit(0)
   } catch (error) {
     console.error('Erro na inicialização:', error)
+    await closePool()
     process.exit(1)
   }
 }

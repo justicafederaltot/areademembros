@@ -1,11 +1,11 @@
-import pool from '../lib/database'
+import { query, closePool } from '../lib/database'
 
 async function restoreOriginalImages() {
   try {
     console.log('Restaurando URLs originais das imagens dos cursos...')
     
     // Buscar todos os cursos
-    const result = await pool.query('SELECT * FROM courses ORDER BY id')
+    const result = await query('SELECT * FROM courses ORDER BY id')
     
     console.log(`\nTotal de cursos encontrados: ${result.rows.length}`)
     
@@ -52,7 +52,7 @@ async function restoreOriginalImages() {
         console.log(`  Imagem original: ${newImageUrl}`)
         
         // Atualizar a URL da imagem no banco
-        await pool.query(
+        await query(
           'UPDATE courses SET image_url = $1 WHERE id = $2',
           [newImageUrl, course.id]
         )
@@ -69,7 +69,7 @@ async function restoreOriginalImages() {
   } catch (error) {
     console.error('Erro ao restaurar imagens dos cursos:', error)
   } finally {
-    await pool.end()
+    await closePool()
   }
 }
 

@@ -1,4 +1,4 @@
-import pool from '../lib/database'
+import { query, closePool } from '../lib/database'
 import { readdir } from 'fs/promises'
 import { join } from 'path'
 
@@ -14,7 +14,7 @@ async function fixAllImageUrls() {
     console.log('Arquivos encontrados:', imageFiles)
 
     // Buscar todos os cursos
-    const courses = await pool.query('SELECT id, title, image_url FROM courses')
+    const courses = await query('SELECT id, title, image_url FROM courses')
     
     console.log('Cursos encontrados:', courses.rows.length)
 
@@ -47,7 +47,7 @@ async function fixAllImageUrls() {
           
           if (similarFile) {
             const newUrl = `/uploads/${similarFile}`
-            await pool.query(
+            await query(
               'UPDATE courses SET image_url = $1 WHERE id = $2',
               [newUrl, course.id]
             )
@@ -62,7 +62,7 @@ async function fixAllImageUrls() {
     }
 
     // Verificar resultado final
-    const finalResult = await pool.query('SELECT title, image_url FROM courses ORDER BY title')
+    const finalResult = await query('SELECT title, image_url FROM courses ORDER BY title')
     console.log('Status final dos cursos:')
     finalResult.rows.forEach(course => {
       console.log(`- ${course.title}: ${course.image_url || 'Sem imagem'}`)
@@ -71,7 +71,7 @@ async function fixAllImageUrls() {
   } catch (error) {
     console.error('Erro ao corrigir URLs:', error)
   } finally {
-    await pool.end()
+    await closePool()
   }
 }
 

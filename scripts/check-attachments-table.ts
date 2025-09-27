@@ -1,11 +1,11 @@
-import pool from '../lib/database'
+import { query, closePool } from '../lib/database'
 
 async function checkAttachmentsTable() {
   try {
     console.log('🔍 Verificando estrutura da tabela lesson_attachments...')
     
     // Verificar se a tabela existe
-    const tableExists = await pool.query(`
+    const tableExists = await query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables 
         WHERE table_schema = 'public' 
@@ -16,7 +16,7 @@ async function checkAttachmentsTable() {
     if (!tableExists.rows[0].exists) {
       console.log('❌ Tabela lesson_attachments não existe! Criando...')
       
-      await pool.query(`
+      await query(`
         CREATE TABLE IF NOT EXISTS lesson_attachments (
           id SERIAL PRIMARY KEY,
           lesson_id INTEGER REFERENCES lessons(id) ON DELETE CASCADE,
@@ -35,7 +35,7 @@ async function checkAttachmentsTable() {
     }
     
     // Verificar estrutura da tabela
-    const columns = await pool.query(`
+    const columns = await query(`
       SELECT column_name, data_type, is_nullable, column_default
       FROM information_schema.columns 
       WHERE table_name = 'lesson_attachments' 
@@ -48,17 +48,17 @@ async function checkAttachmentsTable() {
     })
     
     // Verificar dados existentes
-    const attachmentsCount = await pool.query('SELECT COUNT(*) FROM lesson_attachments')
+    const attachmentsCount = await query('SELECT COUNT(*) FROM lesson_attachments')
     console.log(`\n📊 Total de anexos cadastrados: ${attachmentsCount.rows[0].count}`)
     
     if (parseInt(attachmentsCount.rows[0].count) > 0) {
-      const sampleAttachment = await pool.query('SELECT id, lesson_id, filename, original_name, content_type, file_size, created_at FROM lesson_attachments LIMIT 1')
+      const sampleAttachment = await query('SELECT id, lesson_id, filename, original_name, content_type, file_size, created_at FROM lesson_attachments LIMIT 1')
       console.log('\n📝 Exemplo de anexo:')
       console.log(sampleAttachment.rows[0])
     }
     
     // Verificar se o campo attachments existe na tabela lessons
-    const lessonsColumns = await pool.query(`
+    const lessonsColumns = await query(`
       SELECT column_name, data_type, is_nullable, column_default
       FROM information_schema.columns 
       WHERE table_name = 'lessons' AND column_name = 'attachments'
@@ -67,7 +67,7 @@ async function checkAttachmentsTable() {
     if (lessonsColumns.rows.length === 0) {
       console.log('\n⚠️  Campo attachments não existe na tabela lessons! Adicionando...')
       
-      await pool.query(`
+      await query(`
         ALTER TABLE lessons 
         ADD COLUMN attachments JSONB DEFAULT '[]'
       `)
@@ -80,7 +80,7 @@ async function checkAttachmentsTable() {
   } catch (error) {
     console.error('❌ Erro ao verificar tabela:', error)
   } finally {
-    await pool.end()
+    await closePool()
     process.exit(0)
   }
 }

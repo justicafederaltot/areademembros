@@ -5,7 +5,8 @@ import {
   createAdminUser, 
   createSampleData, 
   testConnection,
-  closePool 
+  closePool,
+  default as pool
 } from './database-postgres'
 
 // Re-exportar funções do PostgreSQL
@@ -17,6 +18,9 @@ export {
   testConnection,
   closePool 
 }
+
+// Exportar pool como default
+export { pool as default }
 
 // Função para inicializar o banco completo
 export async function initializeDatabase() {
@@ -46,5 +50,3 @@ export async function initializeDatabase() {
   }
 }
 
-// Função de compatibilidade (para não quebrar código existente)
-export default { query, initDatabase }

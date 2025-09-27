@@ -1,4 +1,4 @@
-import pool from '../lib/database'
+import { query, closePool } from '../lib/database'
 
 async function fixCourseImages() {
   try {
@@ -15,7 +15,7 @@ async function fixCourseImages() {
     }
     
     // Buscar todos os cursos
-    const result = await pool.query('SELECT * FROM courses ORDER BY id')
+    const result = await query('SELECT * FROM courses ORDER BY id')
     
     console.log(`\nTotal de cursos encontrados: ${result.rows.length}`)
     
@@ -34,7 +34,7 @@ async function fixCourseImages() {
         console.log(`  Nova imagem: ${newImageUrl}`)
         
         // Atualizar a URL da imagem no banco
-        await pool.query(
+        await query(
           'UPDATE courses SET image_url = $1 WHERE id = $2',
           [newImageUrl, course.id]
         )
@@ -51,7 +51,7 @@ async function fixCourseImages() {
   } catch (error) {
     console.error('Erro ao corrigir imagens dos cursos:', error)
   } finally {
-    await pool.end()
+    await closePool()
   }
 }
 
