@@ -38,3 +38,14 @@ next-env.d.ts
 # uploads
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# database
+database.sqlite
+*.sqlite
+*.db
+
+# test files
+test-*.js
+test-*.bat
+scripts/test-*.js
+scripts/test-*.ts

@@ -19,7 +19,6 @@
     "@types/react-slick": "^0.23.13",
     "autoprefixer": "^10.4.16",
     "bcryptjs": "^2.4.3",
-    "better-sqlite3": "^12.4.1",
     "form-data": "^4.0.4",
     "framer-motion": "^10.16.16",
     "jsonwebtoken": "^9.0.2",
@@ -32,7 +31,6 @@
     "react-dom": "^18",
     "react-slick": "^0.29.0",
     "slick-carousel": "^1.8.1",
-    "sqlite3": "^5.1.7",
     "tailwindcss": "^3.3.6",
     "typescript": "^5"
   },
