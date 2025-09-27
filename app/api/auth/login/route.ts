@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import pool from '@/lib/database'
+import { query } from '@/lib/database'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
@@ -19,12 +19,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Buscar usuário no banco
-    const result = await pool.query(
-      'SELECT * FROM users WHERE email = $1',
-      [email]
-    )
-
+    // Buscar usuário no banco PostgreSQL
+    const result = await query('SELECT * FROM users WHERE email = $1', [email])
     const user = result.rows[0]
 
     if (!user) {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
-import pool from '@/lib/database'
+import { query } from '@/lib/database'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     console.log('ID da aula:', lessonId)
 
     // Verificar se a aula existe
-    const lessonResult = await pool.query(
+    const lessonResult = await query(
       'SELECT * FROM lessons WHERE id = $1',
       [parseInt(lessonId)]
     )
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       
       try {
         // Salvar anexo na tabela lesson_attachments
-        const result = await pool.query(
+        const result = await query(
           'INSERT INTO lesson_attachments (lesson_id, filename, original_name, content_type, file_size, file_data) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id',
           [parseInt(lessonId), fileName, file.name, file.type, file.size, buffer]
         )
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
         
         const updatedAttachments = [...currentAttachments, newAttachment]
         
-        await pool.query(
+        await query(
           'UPDATE lessons SET attachments = $1 WHERE id = $2',
           [JSON.stringify(updatedAttachments), parseInt(lessonId)]
         )
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
       
       const updatedAttachments = [...currentAttachments, newAttachment]
       
-      await pool.query(
+      await query(
         'UPDATE lessons SET attachments = $1 WHERE id = $2',
         [JSON.stringify(updatedAttachments), parseInt(lessonId)]
       )

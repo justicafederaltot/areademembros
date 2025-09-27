@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import pool from '@/lib/database'
+import { query } from '@/lib/database'
 
 // Forçar rota dinâmica para evitar erro de SSG
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
   try {
-    const result = await pool.query(
-      'SELECT * FROM courses ORDER BY created_at DESC'
-    )
-
+    const result = await query('SELECT * FROM courses ORDER BY created_at DESC')
     return NextResponse.json(result.rows)
   } catch (error) {
     console.error('Error fetching courses:', error)
@@ -31,12 +28,15 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await pool.query(
-      'INSERT INTO courses (title, description, image_url, category) VALUES ($1, $2, $3, $4) RETURNING *',
-      [title, description, image_url, category]
-    )
+    const db = new Database('database.sqlite')
+    const result = db.prepare(
+      'INSERT INTO courses (title, description, image_url, category) VALUES (?, ?, ?, ?)'
+    ).run(title, description, image_url, category)
+    
+    const newCourse = db.prepare('SELECT * FROM courses WHERE id = ?').get(result.lastInsertRowid)
+    db.close()
 
-    return NextResponse.json(result.rows[0], { status: 201 })
+    return NextResponse.json(newCourse, { status: 201 })
   } catch (error) {
     console.error('Error creating course:', error)
     return NextResponse.json(

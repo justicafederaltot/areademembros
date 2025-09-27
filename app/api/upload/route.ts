@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
-import pool from '@/lib/database'
+import { query } from '@/lib/database'
 
 // Forçar rota dinâmica para evitar erro de SSG
 export const dynamic = 'force-dynamic'
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
       console.log('Ambiente de produção detectado - salvando no banco de dados')
       
       // Salvar informações da imagem no banco de dados
-      const result = await pool.query(
+      const result = await query(
         'INSERT INTO uploaded_images (filename, original_name, content_type, file_size, file_data) VALUES ($1, $2, $3, $4, $5) RETURNING id',
         [fileName, file.name, file.type, file.size, buffer]
       )

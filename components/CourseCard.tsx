@@ -32,13 +32,13 @@ export default function CourseCard({ course }: CourseCardProps) {
   }
 
   return (
-    <div className="p-2">
+    <div className="p-1 sm:p-2">
       <div 
         onClick={handleClick}
         className="bg-black border border-gray-700 rounded-lg overflow-hidden hover:border-primary-500 transition-all duration-300 hover:transform hover:scale-105 cursor-pointer group"
       >
         {/* Image */}
-        <div className="relative h-48 bg-gradient-to-br from-gray-600 to-gray-700">
+        <div className="relative h-36 sm:h-48 bg-gradient-to-br from-gray-600 to-gray-700">
           {course.image_url && !imageError ? (
             <img 
               src={course.image_url} 
@@ -75,11 +75,11 @@ export default function CourseCard({ course }: CourseCardProps) {
         </div>
 
         {/* Content */}
-        <div className="p-4">
-          <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-primary-400 transition-colors">
+        <div className="p-3 sm:p-4">
+          <h3 className="text-base sm:text-lg font-semibold text-white mb-2 group-hover:text-primary-400 transition-colors line-clamp-2">
             {course.title}
           </h3>
-          <p className="text-sm text-gray-400 leading-relaxed">
+          <p className="text-xs sm:text-sm text-gray-400 leading-relaxed line-clamp-3">
             {course.description}
           </p>
         </div>

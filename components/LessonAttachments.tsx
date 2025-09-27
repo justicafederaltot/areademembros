@@ -200,34 +200,35 @@ export function LessonAttachmentsDisplay({ attachments }: LessonAttachmentsDispl
     return '📎'
   }
 
-  if (attachments.length === 0) {
+  // Verificar se attachments é um array válido
+  if (!attachments || !Array.isArray(attachments) || attachments.length === 0) {
     return null
   }
 
   return (
-    <div className="mt-6 p-4 bg-gray-900 rounded-lg border border-gray-700">
-      <h4 className="text-lg font-semibold text-white mb-4 flex items-center">
+    <div className="mt-4 sm:mt-6 p-3 sm:p-4 bg-gray-900 rounded-lg border border-gray-700">
+      <h4 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center">
         <span className="mr-2">📎</span>
         Anexos da Aula
       </h4>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
         {attachments.map((attachment) => (
           <div
             key={attachment.id}
-            className="flex items-center p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
+            className="flex flex-col sm:flex-row items-start sm:items-center p-2 sm:p-3 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
           >
-            <span className="text-2xl mr-3">{getFileIcon(attachment.content_type)}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-white font-medium truncate" title={attachment.original_name}>
+            <span className="text-xl sm:text-2xl mr-2 sm:mr-3 mb-1 sm:mb-0">{getFileIcon(attachment.content_type)}</span>
+            <div className="flex-1 min-w-0 w-full sm:w-auto">
+              <p className="text-white font-medium truncate text-sm sm:text-base" title={attachment.original_name}>
                 {attachment.original_name}
               </p>
-              <p className="text-gray-400 text-sm">{formatFileSize(attachment.file_size)}</p>
+              <p className="text-gray-400 text-xs sm:text-sm">{formatFileSize(attachment.file_size)}</p>
             </div>
             <a
               href={attachment.url}
               download={attachment.original_name}
-              className="ml-2 bg-primary-500 hover:bg-primary-600 text-white px-3 py-1 rounded-md text-sm transition-colors whitespace-nowrap"
+              className="mt-2 sm:mt-0 ml-0 sm:ml-2 bg-primary-500 hover:bg-primary-600 text-white px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm transition-colors whitespace-nowrap w-full sm:w-auto text-center"
             >
               Download
             </a>

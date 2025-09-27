@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
-import pool from '@/lib/database'
+import { query } from '@/lib/database'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,17 +22,13 @@ export async function GET(
       // Buscar imagem no banco de dados
       console.log('Buscando imagem no banco de dados, ID:', imageId)
       
-      const result = await pool.query(
-        'SELECT * FROM uploaded_images WHERE id = $1',
-        [imageId]
-      )
+      const result = await query('SELECT * FROM uploaded_images WHERE id = $1', [imageId])
+      const imageData = result.rows[0]
       
-      if (result.rows.length === 0) {
+      if (!imageData) {
         console.log('Imagem não encontrada no banco de dados:', imageId)
         return NextResponse.json({ error: 'Imagem não encontrada' }, { status: 404 })
       }
-      
-      const imageData = result.rows[0]
       const imageBuffer = imageData.file_data
       
       // Determinar o tipo MIME baseado na extensão

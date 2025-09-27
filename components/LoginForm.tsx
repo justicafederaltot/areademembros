@@ -38,23 +38,23 @@ export default function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center px-4">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 py-8">
       <div className="max-w-md w-full">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="flex items-center justify-center mb-3 sm:mb-4">
             <img 
-              src="/images/logo/LGOMARCA.png" 
+              src="/images/logo/LGOMARCA JEFLIX.png" 
               alt="Destrava Logo" 
-              className="h-16 w-auto"
+              className="h-12 sm:h-16 w-auto"
             />
           </div>
-          <h2 className="text-2xl font-bold text-white">Área de Membros</h2>
-          <p className="text-gray-400 mt-2">Faça login para acessar seus tutoriais</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Área de Membros</h2>
+          <p className="text-sm sm:text-base text-gray-400 mt-2">Faça login para acessar seus tutoriais</p>
         </div>
 
         {/* Login Form */}
-        <div className="bg-black rounded-lg p-8 border border-gray-700">
+        <div className="bg-black rounded-lg p-4 sm:p-6 lg:p-8 border border-gray-700">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-md p-3">

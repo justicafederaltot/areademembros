@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import pool from '@/lib/database'
+import { query } from '@/lib/database'
 
 // Forçar rota dinâmica para evitar erro de SSG
 export const dynamic = 'force-dynamic'
@@ -18,7 +18,7 @@ export async function GET(
       )
     }
 
-    const result = await pool.query(
+    const result = await query(
       'SELECT * FROM lessons WHERE course_id = $1 ORDER BY order_index ASC',
       [courseId]
     )
@@ -48,7 +48,7 @@ export async function POST(
       )
     }
 
-    const result = await pool.query(
+    const result = await query(
       'INSERT INTO lessons (course_id, title, description, video_url, order_index, attachments) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
       [courseId, title, description, video_url, order_index || 1, JSON.stringify(attachments || [])]
     )

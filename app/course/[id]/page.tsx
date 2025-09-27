@@ -101,17 +101,17 @@ export default function CoursePage() {
     <div className="min-h-screen bg-black">
       <Header />
       
-      <main className="flex h-[calc(100vh-64px)]">
+      <main className="flex flex-col lg:flex-row h-[calc(100vh-64px)]">
         {/* Video Player Section */}
         <div className="flex-1 flex flex-col">
           {/* Top Bar */}
           <div className="bg-black border-b border-gray-700 p-4">
             <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-white">
+              <div className="flex-1 min-w-0">
+                <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-white truncate">
                   {selectedLesson?.title || course.title}
                 </h1>
-                <nav className="text-sm text-gray-400 mt-1">
+                <nav className="text-xs sm:text-sm text-gray-400 mt-1 truncate">
                   Início &gt; {course.title}
                 </nav>
               </div>
@@ -119,11 +119,11 @@ export default function CoursePage() {
           </div>
 
           {/* Video Player */}
-          <div className="flex-1 p-4">
+          <div className="flex-1 p-2 sm:p-4">
             {selectedLesson ? (
               <div className="space-y-4">
-                {/* Video Player - Reduzido para 70% da altura */}
-                <div className="h-[70vh]">
+                {/* Video Player - Responsivo */}
+                <div className="h-[40vh] sm:h-[50vh] lg:h-[70vh]">
                   <VideoPlayer 
                     videoUrl={selectedLesson.video_url}
                     lessonId={selectedLesson.id}
@@ -138,14 +138,14 @@ export default function CoursePage() {
               </div>
             ) : (
               <div className="w-full h-full bg-black rounded-lg flex items-center justify-center">
-                <p className="text-gray-400">Selecione uma aula para começar</p>
+                <p className="text-gray-400 text-sm sm:text-base">Selecione uma aula para começar</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Lesson List Sidebar */}
-        <div className="w-80 bg-black border-l border-gray-700">
+        <div className="w-full lg:w-80 bg-black border-t lg:border-l lg:border-t-0 border-gray-700 max-h-[40vh] lg:max-h-none">
           <LessonList 
             course={course}
             selectedLesson={selectedLesson}

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import jwt from 'jsonwebtoken'
-import pool from '@/lib/database'
+import { query } from '@/lib/database'
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key'
 
@@ -30,20 +30,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar se já existe progresso para esta aula
-    const existingProgress = await pool.query(
+    const existingResult = await query(
       'SELECT * FROM user_progress WHERE user_id = $1 AND lesson_id = $2',
       [decoded.userId, lessonId]
     )
 
-    if (existingProgress.rows.length > 0) {
+    if (existingResult.rows.length > 0) {
       // Atualizar progresso existente
-      await pool.query(
+      await query(
         'UPDATE user_progress SET completed = true, completed_at = CURRENT_TIMESTAMP WHERE user_id = $1 AND lesson_id = $2',
         [decoded.userId, lessonId]
       )
     } else {
       // Criar novo progresso
-      await pool.query(
+      await query(
         'INSERT INTO user_progress (user_id, lesson_id, completed, completed_at) VALUES ($1, $2, true, CURRENT_TIMESTAMP)',
         [decoded.userId, lessonId]
       )

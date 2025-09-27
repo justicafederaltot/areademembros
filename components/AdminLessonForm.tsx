@@ -141,7 +141,7 @@ export default function AdminLessonForm({
 
           <div>
             <label htmlFor="video_url" className="block text-sm font-medium text-gray-300 mb-2">
-              URL do Vídeo (YouTube)
+              URL do Vídeo (YouTube ou Dailymotion)
             </label>
             <input
               type="url"
@@ -151,10 +151,10 @@ export default function AdminLessonForm({
               onChange={handleChange}
               required
               className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="https://www.youtube.com/watch?v=..."
+              placeholder="https://www.youtube.com/watch?v=... ou https://dai.ly/..."
             />
             <p className="text-xs text-gray-400 mt-1">
-              Cole aqui o link completo do vídeo do YouTube
+              Cole aqui o link do vídeo (YouTube ou Dailymotion). Suportamos URLs completas e encurtadas (dai.ly)
             </p>
           </div>
 

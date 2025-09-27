@@ -1,11 +1,13 @@
 'use client'
 
 import { useAuth } from './AuthProvider'
-import { LogOut } from 'lucide-react'
+import { LogOut, Menu, X } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 export default function Header() {
   const { user, logout } = useAuth()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
     <header className="bg-black border-b border-gray-800">
@@ -14,24 +16,21 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
             <img 
-              src="/images/logo/LGOMARCA.png" 
+              src="/images/logo/LGOMARCA JEFLIX.png" 
               alt="JF-TOT Logo" 
-              className="h-8 w-auto"
+              className="h-6 sm:h-8 w-auto"
             />
           </Link>
 
-          {/* Navigation */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="/" className="text-gray-300 hover:text-white transition-colors">
               Início
             </Link>
-            <a href="https://instagram.com" className="text-gray-300 hover:text-white transition-colors">
-              Instagram
-            </a>
           </nav>
 
-          {/* User Menu */}
-          <div className="flex items-center space-x-4">
+          {/* Desktop User Menu */}
+          <div className="hidden md:flex items-center space-x-4">
             {user && (
               <>
                 <span className="text-gray-300 text-sm">
@@ -55,7 +54,54 @@ export default function Header() {
               </>
             )}
           </div>
+
+          {/* Mobile Menu Button */}
+          {user && (
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-gray-300 hover:text-white transition-colors"
+            >
+              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          )}
         </div>
+
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && user && (
+          <div className="md:hidden border-t border-gray-800 py-4">
+            <div className="flex flex-col space-y-4">
+              <Link 
+                href="/" 
+                className="text-gray-300 hover:text-white transition-colors px-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Início
+              </Link>
+              <div className="text-gray-300 px-2">
+                Olá, {user.name}
+              </div>
+              {user.role === 'admin' && (
+                <Link 
+                  href="/admin" 
+                  className="text-primary-500 hover:text-primary-400 transition-colors px-2"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Admin
+                </Link>
+              )}
+              <button
+                onClick={() => {
+                  logout()
+                  setIsMobileMenuOpen(false)
+                }}
+                className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors px-2 text-left"
+              >
+                <LogOut className="h-4 w-4" />
+                <span>Sair</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   )
