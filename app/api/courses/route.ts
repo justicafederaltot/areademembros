@@ -28,15 +28,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const db = new Database('database.sqlite')
-    const result = db.prepare(
-      'INSERT INTO courses (title, description, image_url, category) VALUES (?, ?, ?, ?)'
-    ).run(title, description, image_url, category)
-    
-    const newCourse = db.prepare('SELECT * FROM courses WHERE id = ?').get(result.lastInsertRowid)
-    db.close()
+    const result = await query(
+      'INSERT INTO courses (title, description, image_url, category) VALUES ($1, $2, $3, $4) RETURNING *',
+      [title, description, image_url, category]
+    )
 
-    return NextResponse.json(newCourse, { status: 201 })
+    return NextResponse.json(result.rows[0], { status: 201 })
   } catch (error) {
     console.error('Error creating course:', error)
     return NextResponse.json(

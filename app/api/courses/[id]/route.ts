@@ -51,26 +51,21 @@ export async function PUT(
         { status: 400 }
       )
     }
-
-    const db = new Database('database.sqlite')
     
     // Verificar se o curso existe
-    const course = db.prepare('SELECT * FROM courses WHERE id = ?').get(courseId)
+    const courseResult = await query('SELECT * FROM courses WHERE id = $1', [courseId])
     
-    if (!course) {
-      db.close()
+    if (courseResult.rows.length === 0) {
       return NextResponse.json({ error: 'Curso não encontrado' }, { status: 404 })
     }
 
     // Atualizar o curso
-    db.prepare(
-      'UPDATE courses SET title = ?, description = ?, image_url = ?, category = ? WHERE id = ?'
-    ).run(title, description, image_url, category, courseId)
+    const result = await query(
+      'UPDATE courses SET title = $1, description = $2, image_url = $3, category = $4 WHERE id = $5 RETURNING *',
+      [title, description, image_url, category, courseId]
+    )
 
-    const updatedCourse = db.prepare('SELECT * FROM courses WHERE id = ?').get(courseId)
-    db.close()
-
-    return NextResponse.json(updatedCourse)
+    return NextResponse.json(result.rows[0])
   } catch (error) {
     console.error('Error updating course:', error)
     return NextResponse.json(
@@ -88,28 +83,24 @@ export async function DELETE(
     const courseId = parseInt(params.id)
     console.log('Tentando deletar curso:', courseId)
     
-    const db = new Database('database.sqlite')
-    
     // Verificar se o curso existe
-    const course = db.prepare('SELECT * FROM courses WHERE id = ?').get(courseId)
+    const courseResult = await query('SELECT * FROM courses WHERE id = $1', [courseId])
     
-    if (!course) {
+    if (courseResult.rows.length === 0) {
       console.log('Curso não encontrado:', courseId)
-      db.close()
       return NextResponse.json({ error: 'Curso não encontrado' }, { status: 404 })
     }
     
     console.log('Curso encontrado, deletando aulas...')
     
     // Deletar todas as aulas do curso primeiro (devido à foreign key)
-    const lessonsDeleteResult = db.prepare('DELETE FROM lessons WHERE course_id = ?').run(courseId)
-    console.log('Aulas deletadas:', lessonsDeleteResult.changes)
+    await query('DELETE FROM lessons WHERE course_id = $1', [courseId])
+    console.log('Aulas deletadas')
     
     // Deletar o curso
-    const courseDeleteResult = db.prepare('DELETE FROM courses WHERE id = ?').run(courseId)
-    console.log('Curso deletado:', courseDeleteResult.changes)
+    await query('DELETE FROM courses WHERE id = $1', [courseId])
+    console.log('Curso deletado com sucesso')
     
-    db.close()
     return NextResponse.json({ message: 'Curso deletado com sucesso' })
   } catch (error) {
     console.error('Error deleting course:', error)
