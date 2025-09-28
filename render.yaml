@@ -11,5 +11,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: DATABASE_URL
-        value: postgresql://banco_de_dados_vuva_user:LHQJEKNnL3xqOP0YVBLewsO7iLwyBDUV@dpg-d2f3skmmcj7s73893m80-a.oregon-postgres.render.com/banco_de_dados_vuva
+        value: postgresql://banco_de_dados_ahwt_user:HmFYomHKqCBRvPCz0i2bWpedhKCiTaTz@dpg-d3c58d37mgec73a82gp0-a.oregon-postgres.render.com/banco_de_dados_ahwt
+      - key: INIT_TOKEN
+        value: init-secret-token-2024
     healthCheckPath: /
