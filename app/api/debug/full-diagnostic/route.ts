@@ -19,17 +19,17 @@ export async function GET() {
       },
       database: {
         connected: false,
-        error: null
+        error: null as string | null
       },
       users: {
         total: 0,
-        list: [],
+        list: [] as any[],
         admin_exists: false
       },
       tests: {
-        connection_test: null,
-        user_query_test: null,
-        password_hash_test: null
+        connection_test: null as string | null,
+        user_query_test: null as string | null,
+        password_hash_test: null as string | null
       }
     }
     
