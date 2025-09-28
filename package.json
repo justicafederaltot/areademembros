@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "init-postgres": "tsx scripts/init-postgres.ts",
-    "init-production": "node scripts/init-production-db.js"
+    "init-production": "node scripts/init-production-db.js",
+    "test-debug": "node scripts/test-debug-routes.js"
   },
   "dependencies": {
     "@types/bcryptjs": "^2.4.6",
