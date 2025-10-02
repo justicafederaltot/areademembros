@@ -16,7 +16,7 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
             <img 
-              src="/images/logo/LGOMARCA JEFLIX.png" 
+              src="/images/logo/LGOMARCA JEF FLIX.png" 
               alt="JF-TOT Logo" 
               className="h-6 sm:h-8 w-auto"
             />

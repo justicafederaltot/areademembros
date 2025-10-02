@@ -32,7 +32,13 @@ export async function PUT(
       [title, description, video_url, order_index, JSON.stringify(attachments || []), lessonId]
     )
 
-    return NextResponse.json(result.rows[0])
+    // Parsear attachments de string JSON para array
+    const lesson = result.rows[0]
+    lesson.attachments = typeof lesson.attachments === 'string' 
+      ? JSON.parse(lesson.attachments) 
+      : (lesson.attachments || [])
+
+    return NextResponse.json(lesson)
   } catch (error) {
     console.error('Error updating lesson:', error)
     return NextResponse.json(

@@ -23,7 +23,15 @@ export async function GET(
       [courseId]
     )
 
-    return NextResponse.json(result.rows)
+    // Parsear attachments de string JSON para array
+    const lessons = result.rows.map(lesson => ({
+      ...lesson,
+      attachments: typeof lesson.attachments === 'string' 
+        ? JSON.parse(lesson.attachments) 
+        : (lesson.attachments || [])
+    }))
+
+    return NextResponse.json(lessons)
   } catch (error) {
     console.error('Error fetching lessons:', error)
     return NextResponse.json(
@@ -53,7 +61,13 @@ export async function POST(
       [courseId, title, description, video_url, order_index || 1, JSON.stringify(attachments || [])]
     )
 
-    return NextResponse.json(result.rows[0], { status: 201 })
+    // Parsear attachments de string JSON para array
+    const lesson = result.rows[0]
+    lesson.attachments = typeof lesson.attachments === 'string' 
+      ? JSON.parse(lesson.attachments) 
+      : (lesson.attachments || [])
+
+    return NextResponse.json(lesson, { status: 201 })
   } catch (error) {
     console.error('Error creating lesson:', error)
     return NextResponse.json(

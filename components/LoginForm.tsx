@@ -44,7 +44,7 @@ export default function LoginForm() {
         <div className="text-center mb-6 sm:mb-8">
           <div className="flex items-center justify-center mb-3 sm:mb-4">
             <img 
-              src="/images/logo/LGOMARCA JEFLIX.png" 
+              src="/images/logo/LGOMARCA JEF FLIX.png" 
               alt="Destrava Logo" 
               className="h-12 sm:h-16 w-auto"
             />

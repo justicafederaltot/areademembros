@@ -25,9 +25,17 @@ export async function GET(
       [courseId]
     )
     
+    // Parsear attachments de string JSON para array
+    const lessons = lessonsResult.rows.map(lesson => ({
+      ...lesson,
+      attachments: typeof lesson.attachments === 'string' 
+        ? JSON.parse(lesson.attachments) 
+        : (lesson.attachments || [])
+    }))
+    
     const courseWithLessons = {
       ...course,
-      lessons: lessonsResult.rows
+      lessons: lessons
     }
     
     return NextResponse.json(courseWithLessons)
