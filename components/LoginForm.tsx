@@ -105,7 +105,7 @@ export default function LoginForm() {
 
                      {/* Demo Credentials */}
            <div className="mt-6 p-4 bg-gray-900 rounded-md">
-             <h3 className="text-sm font-medium text-gray-300 mb-2">Credenciais de Demonstração:</h3>
+             <h3 className="text-sm font-medium text-gray-300 mb-2">Credenciais de Acesso:</h3>
              <div className="text-xs text-gray-400 space-y-1">
                <p><strong>Admin:</strong> jeflix@jus.com / admin1234</p>
              </div>
