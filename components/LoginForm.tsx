@@ -44,7 +44,7 @@ export default function LoginForm() {
         <div className="text-center mb-6 sm:mb-8">
           <div className="flex items-center justify-center mb-3 sm:mb-4">
             <img 
-              src="/images/logo/LGOMARCA JEF FLIX.png" 
+              src="/images/logo/LOGOMARCA JEF PLAY.png" 
               alt="Destrava Logo" 
               className="h-12 sm:h-16 w-auto"
             />
@@ -107,7 +107,7 @@ export default function LoginForm() {
            <div className="mt-6 p-4 bg-gray-900 rounded-md">
              <h3 className="text-sm font-medium text-gray-300 mb-2">Credenciais de Acesso:</h3>
              <div className="text-xs text-gray-400 space-y-1">
-               <p><strong>Admin:</strong> jeflix@jus.com / admin1234</p>
+               <p><strong>Admin:</strong> admin@jus.com / admin123</p>
              </div>
            </div>
         </div>
